@@ -4,6 +4,12 @@ Changelog
 2.3.2 (unreleased)
 ------------------
 
+- Use context url as a cache key and not portal_url
+  [erral]
+
+- Add Language='all' as a keyword argument to avoid LinguaPlone deleting it
+  [erral]
+
 - Avoid extra space at the end of icon alt attributes.
   [davisagli]
 
