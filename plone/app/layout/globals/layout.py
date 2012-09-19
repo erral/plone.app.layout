@@ -1,3 +1,5 @@
+from zope.component import getUtility
+from plone.registry.interfaces import IRegistry
 from plone.i18n.normalizer.interfaces import IIDNormalizer
 from plone.memoize.view import memoize
 from plone.portlets.interfaces import IPortletManager
@@ -143,9 +145,25 @@ class LayoutPolicy(BrowserView):
         navroot = portal_state.navigation_root()
         body_class += " site-%s" % navroot.getId()
 
-        contentPath = context.getPhysicalPath()[len(navroot.getPhysicalPath()):]
+        contentPath = context.getPhysicalPath()[
+            len(navroot.getPhysicalPath()):]
         if contentPath:
             body_class += " section-%s" % contentPath[0]
+
+            # skip first section since we already have that...
+            if len(contentPath) > 1:
+                registry = getUtility(IRegistry)
+                try:
+                    depth = registry[
+                        'plone.app.layout.globals.bodyClass.depth']
+                except KeyError:
+                    depth = 4
+                if depth > 1:
+                    classes = [contentPath[1]]
+                    for section in contentPath[2:depth]:
+                        classes.append('-'.join([classes[-1], section]))
+                    body_class += " %s" % ' '.join(classes)
+
 
         # class for hiding icons (optional)
         if self.icons_visible():
